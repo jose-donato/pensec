@@ -5,7 +5,7 @@ from pensec.Target import Target
 from utils.Logger import Logger
 from utils.Dependencies import check_dependencies
 from utils.Terminal import acknowledge
-from tools.list import TOOLS
+from tools.list import TOOLS, missing_tool_dependencies
 from pathlib import Path
 
 
@@ -71,7 +71,12 @@ class Pipeline(object):
         if len(self.tools) == 0:
             self.logger.error("Must add tools...")
             return
-        
+        missing = missing_tool_dependencies(self.tools)
+        if missing:
+            self.logger.error(missing)
+            self.logger.error("Did not execute. Please fullfil requirements...")
+            return
+
         # TODO:
         # verificar que não falta dependência
         # ordenar tools segundo dependências

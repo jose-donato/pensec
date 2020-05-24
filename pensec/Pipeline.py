@@ -58,8 +58,15 @@ class Pipeline(object):
         # verificar que não falta dependência
         # ordenar tools segundo dependências
         # obter output dos runs, passar para REPORTING e TOOLS subsequentes
+        last_out = None
+        last_tool_name = None
         for tool in self.tools:
-            out, err = tool.run()
+            if last_tool_name == "nmap" and tool.name == "searchsploit":
+                out, err = tool.run(last_out)
+            else:
+                out, err = tool.run()
+            last_out = out
+            last_tool_name = tool.name
             if err:
                 self.logger.error(err.decode('ascii'))
             else:

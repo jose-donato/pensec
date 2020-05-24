@@ -1,5 +1,7 @@
 from tools.Tool import Tool
 from utils.Command import execute
+import json
+
 
 class Searchsploit(Tool):
     PROGRAM = "searchsploit"
@@ -9,8 +11,19 @@ class Searchsploit(Tool):
         super().__init__("searchsploit", options)
 
     def run(self, keywords):
+        ports = json.loads(keywords)["nmaprun"]["host"]["ports"]["port"]
         # ciclo para cada serviço passado pelo nmap
-        outfile = f"'{self.outdir}/{self.name}_{self.options}.json'"
-        command = f"searchsploit {self.options} {keywords} > {outfile}"
-        self.logger.info(f"Running Searchsploit: {command}")
-        return execute(command)
+        for port in ports:
+            try:
+                product = port["service"]["@product"]
+                #    version = port["service"]["@version"]
+                outfile = f"'{self.outdir}/{self.name}_{self.options}_{product}.json'"
+                #command = f"searchsploit {self.options} {name} {version} > {outfile[1:-1]}"
+                command = f"searchsploit {self.options} {product}"
+                self.logger.info(f"Running Searchsploit: {command}")
+                out, err = execute(command)
+                print(out.decode("utf-8"))
+            except:
+                self.logger.error("Product not found in service")
+        return "", ""
+        # return execute(command)

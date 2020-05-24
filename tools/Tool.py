@@ -14,6 +14,9 @@ class Tool(object):
             return  self.name == other.name and\
                     self.options == other.options
         return False
+    
+    def get_name(self):
+        return self.name
 
     def set_logger(self, logger):
         self.logger = logger

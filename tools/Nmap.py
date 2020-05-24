@@ -8,12 +8,18 @@ from mdutils.mdutils import MdUtils
 
 class Nmap(Tool):
     PROGRAM = "nmap"
-    OPTIONS_PROMPT = "Options (type options):\n1. -sV (default)\n2. -sV --script nmap-vulners,vulscan --script-args vulscandb=scipvuldb.csv\n>> "
+    OPTIONS = Tool.Options([
+        Tool.Option("Detect Versions (default)", "-sV"),
+        Tool.Option("Detect Versions and Vulnerabilities", "-sV --script nmap-vulners,vulscan --script-args vulscandb=scipvuldb.csv"),
+    ])
+    OPTIONS_PROMPT = OPTIONS.prompt()
     REQUIRES = []
     PROVIDES = [Tool.Dependencies.NMAP_SERVICES]
     
     # ter vários Nmaps cada um executado com opções diferentes
     def __init__(self, options):
+        if options.isdigit(): # umas das opcoes built in
+            options = Nmap.OPTIONS.selected(options) or ''
         self.files = []
         if not options:
             options = "-sV"

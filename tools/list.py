@@ -21,3 +21,7 @@ def missing_tool_dependencies(tools):
                 tools_providing = list(map(lambda T: T.__name__, get_tools_providing(TOOLS, r)))
                 missing += f"Tool {t.__class__.__name__} requires {r.value} (provided by: {', '.join(tools_providing)})"
     return missing
+
+def sortby_dependencies(tools):
+    pass
+

@@ -8,6 +8,8 @@ class Tool(object):
     
     def __str__(self):
         return f"Tool: {self.name}, Options: {self.options}"
+    def __repr__(self): # usada para representar tools na config
+        return f"{Tool.__name__};{self.options}"
 
     def __eq__(self, other):
         if isinstance(other, Tool):

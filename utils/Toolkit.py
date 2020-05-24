@@ -9,7 +9,7 @@ from progress.bar import Bar
 def unquote(cpe):
     return re.compile('%([0-9a-fA-F]{2})', re.M).sub(lambda m: "\\" + chr(int(m.group(1), 16)), cpe)
 
-
+# Source: https://github.com/cve-search/cve-search/blob/master/lib/Toolkit.py
 def toStringFormattedCPE(cpe, autofill=False):
     cpe = cpe.strip()
     if not cpe.startswith('cpe:2.3:'):

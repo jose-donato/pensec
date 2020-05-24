@@ -85,3 +85,21 @@ class Pipeline(object):
     def get_assetdir(self):
         path = Path().absolute()
         return str(path)+"/assets/" 
+
+    def viewconfig(self):
+        self.logger.info(f"Showing current config:")
+        self.logger.debug("\n"+str(self.config))
+        print("\n")
+        acknowledge()
+
+    def saveconfig(self):
+        outfile = input("Config name\n>> ")
+        with open(f"config/{outfile}", "w+") as f:
+            f.write(str(self.config))
+        self.logger.info(f"Config saved to {outfile}")
+    
+    # called on exit from main menu
+    def cleanup(self):
+        self.logger.end()
+        from utils.Menu import Menu
+        return Menu.EXIT

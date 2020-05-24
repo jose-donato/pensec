@@ -43,7 +43,8 @@ class Pipeline(object):
         if from_config == False:
             if not hasattr(self, "tool_iota"):
                 # self.tool_iota = len(self.config.tools())
-                self.tool_iota = max( [int(k.split("_")[-1]) for k,v in self.config.tools()] )
+                tool_indexes = [int(k.split("_")[-1]) for k,v in self.config.tools()]
+                self.tool_iota = len(tool_indexes) and max(tool_indexes)
             self.tool_iota += 1
             setattr(self.config, f"TOOL_{self.tool_iota}", f"{repr(tool)}")
         self.logger.info(f"Success")

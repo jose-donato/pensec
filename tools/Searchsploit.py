@@ -15,14 +15,13 @@ class Searchsploit(Tool):
         self.files = []
         super().__init__("searchsploit", options)
 
-    def run(self, xml_files):
-        i=0
-        for xml_file in xml_files:
+    def run(self, dependencies):
+        xml_files = dependencies[Tool.Dependencies.NMAP_SERVICES]
+        for i, xml_file in enumerate(xml_files):
             command = f"searchsploit {self.options} --colour -v --nmap {xml_file} --json"
             self.logger.info(f"Running Searchsploit: {command}")
             out, err = execute(command)
             outfile = f"{self.outdir}/{self.name}_{self.options}_fromNmapXml_{i}.txt"
-            i+=1
             with open(outfile, "a") as f:
                 f.write(out.decode("utf-8"))
         return outfile, err

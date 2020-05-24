@@ -63,7 +63,7 @@ class Nmap(Tool):
         return file_path, err
         '''
         
-    def run(self):
+    def run(self, dependencies):
         target = self.target.hostname
         if "--script nmap-vulners,vulscan --script-args vulscandb=scipvuldb.csv" in self.options:
             ports = self.target.target_ports

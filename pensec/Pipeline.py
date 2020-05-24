@@ -95,7 +95,7 @@ class Pipeline(object):
                 self.logger.error(err.decode('ascii'))
             else:
                 self.logger.info("Output saved")
-            tool.report()
+                tool.report()
 
     def check_dependencies(self):
         self.logger.info("Checking dependencies...")

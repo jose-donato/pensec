@@ -1,8 +1,13 @@
 from datetime import datetime
+from enum import Enum
 
 class Tool(object):
     OPTIONS_PROMPT = "Options:\n>> "
     IGNORE_STDERR = False
+
+    class Dependencies(Enum):
+        NMAP_SERVICES = auto()
+
     def __init__(self, name, options):
         self.name = name
         self.options = options

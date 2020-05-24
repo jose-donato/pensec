@@ -8,8 +8,10 @@ import json
 class Nmap(Tool):
     PROGRAM = "nmap"
     OPTIONS_PROMPT = "Options (type options):\n1. -sV (default)\n2. -sV --script nmap-vulners,vulscan --script-args vulscandb=scipvuldb.csv\n>> "
+    REQUIRES = []
+    PROVIDES = [Tool.Dependencies.NMAP_SERVICES]
+    
     # ter vários Nmaps cada um executado com opções diferentes
-
     def __init__(self, options):
         if not options:
             options = "-sV"

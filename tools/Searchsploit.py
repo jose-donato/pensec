@@ -11,7 +11,7 @@ class Searchsploit(Tool):
         super().__init__("searchsploit", options)
 
     def run(self, xml_file):
-        command = f"searchsploit {self.options} --nmap {xml_file}"
+        command = f"searchsploit {self.options} --colour --nmap {xml_file}"
         self.logger.info(f"Running Searchsploit: {command}")
         out, err = execute(command)
         outfile = f"{self.outdir}/{self.name}_{self.options}_fromNmapXml.txt"

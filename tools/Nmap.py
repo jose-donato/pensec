@@ -15,13 +15,13 @@ class Nmap(Tool):
             options = "-sV"
         super().__init__("nmap", options)
 
-    def run_detect_cve(self):
+    def run_search_cve(self):
         # discover current path
         target = self.target.hostname
-        port = self.target.port  # or common_ports and loop through
+        #port = self.target.port  # or common_ports and loop through
         outfile = f"'{self.outdir}/{self.name}_{self.options}_cve_detection.xml'"
         scripts = "--script nmap-vulners,vulscan --script-args vulscandb=scipvuldb.csv"
-        port_command = f"-p {port}"
+        port_command = f"-p {80}"
         command = f"nmap {self.options} --datadir {self.assetdir} {scripts} {port_command} {target} -oX {outfile}"
         self.logger.info(f"Running Nmap with CVE detection scripts: {command}")
         return execute(command)

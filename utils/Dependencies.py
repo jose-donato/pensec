@@ -5,11 +5,8 @@ from utils.Command import execute
 
 #return true if a certain program is installed, false otherwise
 def check_if_program_is_installed(program):
-    try:
-        out, err = execute(f'{program} --version')
-    except: 
-        return False
-    return True
+    out, err = execute(f'which {program}')
+    return not err
 
 #return true if all dependencies are installed, false otherwise
 def check_dependencies(dependencies, logger):

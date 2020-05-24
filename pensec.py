@@ -60,14 +60,15 @@ def get_target():
     while True:
         os.system("clear")
         target = input("Target (eg. scanme.nmap.org)\n>> ") # localhost
-        try:
-            socket.inet_aton(addr)
-            return target # is IP address
-        except: pass;
-        try: # try to resolve
-            socket.gethostbyname(target)
-            return target # is hostname
-        except: pass;
+        if target:
+            try:
+                socket.inet_aton(addr)
+                return target # is IP address
+            except: pass;
+            try: # try to resolve
+                socket.gethostbyname(target)
+                return target # is hostname
+            except: pass;
         print("Invalid IP/hostname...\nAny key to retry")
         input()
 

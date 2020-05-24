@@ -18,7 +18,7 @@ class Pipeline(object):
         self.assetdir =  self.get_assetdir()
         self.logger = Logger(self.config, f"{self.outdir}/logs")   
 
-        self.check_dependencies()
+        self.available = self.check_dependencies()
         self.logger.info(f"Pipeline initialized for target: {hostname}")
 
     def add_tool(self, tool):
@@ -75,9 +75,10 @@ class Pipeline(object):
     def check_dependencies(self):
         self.logger.info("Checking dependencies...")
         dependencies = TOOLS
-        self.available = check_dependencies(dependencies, self.logger)
-        if len(dependencies) != len(self.available):
+        available = check_dependencies(dependencies, self.logger)
+        if len(dependencies) != len(available):
             acknowledge()
+        return available
     
     def make_outdir(self):
         hostname = self.target.hostname

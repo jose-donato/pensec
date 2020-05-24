@@ -1,3 +1,5 @@
 # Do not change, create another with which to run pensec
 OUTPUT_DIRECTORY = 'output'
 OUTPUT_TO_CONSOLE = True
+
+TOOL_1 = 'Nmap;-sV'

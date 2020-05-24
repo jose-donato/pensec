@@ -8,14 +8,6 @@ cfg = Config(OPTION=<something>)
 cfg = Config.from_file('config/stealthy.txt')
 """
 class Config(object):
-    __slots__ = (
-        "_initialized",
-
-        # OUTPUT
-        "OUTPUT_DIRECTORY",
-        "OUTPUT_TO_CONSOLE",
-    )
-
     DEFAULTS_FILENAME = "config/defaults.txt"
     defaults = {}
 
@@ -45,17 +37,18 @@ class Config(object):
                 params[k] = eval(v)
         return params
 
+    def gettools(self):
+        return ((k, getattr(self, k)) for k in self.__dict__ if k.startswith("TOOL"))
+
     def items(self):
-        return ((k, getattr(self, k)) for k in self.__slots__ if not k.startswith("_"))
+        return ((k, getattr(self, k)) for k in self.__dict__ if not k.startswith("_"))
 
     def __setattr__(self, key, value):
-        if hasattr(self, "_initialized"):
-            raise AttributeError("To change params create new config object.")
-        else:
-            super.__setattr__(self, key, value)
+        super.__setattr__(self, key, value)
 
-    def __delattr__(self, item):
-        raise AttributeError("Cannot delete params.")
+    # será preciso quando removermos tool
+    # def __delattr__(self, item):
+    #    raise AttributeError("Cannot delete params.")
 
     def __str__(self):
         params = []

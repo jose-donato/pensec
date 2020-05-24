@@ -83,7 +83,7 @@ class Pipeline(object):
                 out, err = tool.run()
             last_out = out
             last_tool_name = tool.name
-            if err:
+            if err and not tool.IGNORE_STDERR:
                 self.logger.error(err.decode('ascii'))
             else:
                 self.logger.info("Output saved")

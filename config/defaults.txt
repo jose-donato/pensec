@@ -4,3 +4,4 @@ OUTPUT_TO_CONSOLE = True
 
 # TOOL_iota = tool;options
 TOOL_1 = 'Nmap;-sV'
+TOOL_2 = 'Searchsploit;'

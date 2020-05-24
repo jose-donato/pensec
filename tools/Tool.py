@@ -2,6 +2,7 @@ from datetime import datetime
 
 class Tool(object):
     OPTIONS_PROMPT = "Options:\n>> "
+    IGNORE_STDERR = False
     def __init__(self, name, options):
         self.name = name
         self.options = options

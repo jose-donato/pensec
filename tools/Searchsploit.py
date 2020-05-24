@@ -6,6 +6,7 @@ import json
 class Searchsploit(Tool):
     PROGRAM = "searchsploit"
     OPTIONS_PROMPT = "Options (default: None)\n>> "
+    IGNORE_STDERR = True
 
     def __init__(self, options=""):
         super().__init__("searchsploit", options)

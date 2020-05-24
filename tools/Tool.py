@@ -2,6 +2,7 @@ from datetime import datetime
 
 class Tool(object):
     OPTIONS_PROMPT = "Options:\n>> "
+    IGNORE_STDERR = False
     def __init__(self, name, options):
         self.name = name
         self.options = options
@@ -9,7 +10,7 @@ class Tool(object):
     def __str__(self):
         return f"Tool: {self.name}, Options: {self.options}"
     def __repr__(self): # usada para representar tools na config
-        return f"{Tool.__name__};{self.options}"
+        return f"{self.__class__.__name__};{self.options}"
 
     def __eq__(self, other):
         if isinstance(other, Tool):

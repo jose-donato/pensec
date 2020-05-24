@@ -10,10 +10,10 @@ class Searchsploit(Tool):
     IGNORE_STDERR = True
 
     def __init__(self, options=""):
+        self.files = []
         super().__init__("searchsploit", options)
 
     def run(self, xml_files):
-        print(xml_files)
         i=0
         for xml_file in xml_files:
             command = f"searchsploit {self.options} --colour -v --nmap {xml_file} --json"
@@ -55,3 +55,4 @@ class Searchsploit(Tool):
         reportfile.new_header(level=1, title="Common Statistics")
         reportfile.new_paragraph(f"X exploits found\n")
         reportfile.create_md_file()
+        self.logger.info("Report saved in "+outfile)

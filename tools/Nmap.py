@@ -17,6 +17,7 @@ class Nmap(Tool):
             options = "-sV"
         super().__init__("nmap", options)
 
+    '''
     def run_search_cve(self):
         # discover current path
         target = self.target.hostname
@@ -32,6 +33,7 @@ class Nmap(Tool):
             self.logger.info(f"Running Nmap with CVE detection scripts for port {port}: {command}")
         return files, ""
 
+    
     def run_and_return_json(self):
         target = self.target.hostname
         outfile = f"'{self.outdir}/{self.name}_{self.options}.xml'"
@@ -43,7 +45,7 @@ class Nmap(Tool):
         result = json.dumps(xml_dict)
         return result, err
 
-    '''def run(self):
+    def run(self):
         target = self.target.hostname
         outfile = f"'{self.outdir}/{self.name}_{self.options}.xml'"
         command = f"nmap {self.options} {target} -oX {outfile}"
@@ -80,14 +82,20 @@ class Nmap(Tool):
         xml_dict = parsexmlfile(self.files[0])
         result = json.dumps(xml_dict)
         nmap_results = json.loads(result)
-        open_ports = nmap_results["nmaprun"]["host"]["ports"]["port"]
+        ports = nmap_results["nmaprun"]["host"]["ports"]
+        if 'port' in ports:
+            open_ports = ports["port"]
+        else:
+            open_ports = []
         self.logger.info("Creating report for "+self.name)
         outfile = f"{self.reportdir}/{self.name}.md"
         title= f"PENSEC - {self.name.capitalize()} Report"
         reportfile = MdUtils(file_name=outfile, title=title)
         reportfile.new_header(level=1, title="Common Statistics")
         reportfile.new_paragraph(f"{len(open_ports)} open ports\n")
-        reportfile.new_header(level=2, title="Open Ports")
-        #list with open ports, cpe, etc
+        if len(open_ports) > 0:
+            reportfile.new_header(level=2, title="Open Ports")
+            #list with open ports, cpe, etc
         reportfile.create_md_file()
+        self.logger.info("Report saved in "+outfile)
         

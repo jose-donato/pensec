@@ -80,15 +80,21 @@ class Pipeline(object):
         self.logger.debug(f"Tool order: {','.join([t.__class__.__name__ for t in sorted_tools])}")
         
         outputs = {}
+        reports = {}
+        report_obj = None
         for tool in sorted_tools:
             out, err = tool.run(outputs)
             for p in tool.PROVIDES:
                 outputs[p] = out
+            
+            
             if err and not tool.IGNORE_STDERR:
                 self.logger.error(err.decode('ascii'))
             else:
                 self.logger.info("Output saved")
-                tool.report()
+                report_obj = tool.report(reports)
+                for p in tool.PROVIDES:
+                    reports[p] = report_obj
 
     def check_dependencies(self):
         self.logger.info("Checking dependencies...")

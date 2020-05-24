@@ -2,6 +2,7 @@ from tools.Tool import Tool
 from utils.Command import execute
 import json
 from mdutils.mdutils import MdUtils
+from pathlib import Path
 
 
 class Searchsploit(Tool):
@@ -22,6 +23,7 @@ class Searchsploit(Tool):
             self.logger.info(f"Running Searchsploit: {command}")
             out, err = execute(command)
             outfile = f"{self.outdir}/{self.name}_{self.options}_fromNmapXml_{i}.txt"
+            self.files.append(str(Path().absolute())+"/"+outfile)
             with open(outfile, "a") as f:
                 f.write(out.decode("utf-8"))
         return outfile, err
@@ -29,6 +31,7 @@ class Searchsploit(Tool):
         
 
 
+    '''
     #temp
     def run_custom(self, result_json):
         ports = json.loads(result_json)["nmaprun"]["host"]["ports"]["port"]
@@ -47,9 +50,20 @@ class Searchsploit(Tool):
                 self.logger.error("Product not found in service")
         return "", ""
         # return execute(command)
+    '''
 
-    def report(self):
+    def report(self, reports):
+        report_dict = reports[Tool.Dependencies.NMAP_SERVICES]
         self.logger.info("Creating report for "+self.name)
+        obj = {}
+        for f in self.files:
+            with open(f, "r") as scanfile:
+                scan = json.loads(scanfile.read().split("\n\n")[0])
+                if 'RESULTS_EXPLOIT' in scan and 'SEARCH' in scan:
+                    obj[scan["SEARCH"]] = {
+                        "exploits": scan["RESULTS_EXPLOIT"]
+                    }
+        #temp
         outfile = f"{self.reportdir}/{self.name}.md"
         title= f"PENSEC - {self.name.capitalize()} Report"
         reportfile = MdUtils(file_name=outfile, title=title)
@@ -57,3 +71,5 @@ class Searchsploit(Tool):
         reportfile.new_paragraph(f"X exploits found\n")
         reportfile.create_md_file()
         self.logger.info("Report saved in "+outfile)
+        report_dict["searchsploit_info"] = obj
+        return report_dict 

@@ -89,7 +89,7 @@ class Nmap(Tool):
             self.files = [file_path]
             return [file_path], err
     
-    def report(self):
+    def report(self, reports):
         xml_dict = parsexmlfile(self.files[0])
         result = json.dumps(xml_dict)
         nmap_results = json.loads(result)
@@ -98,6 +98,8 @@ class Nmap(Tool):
             open_ports = ports["port"]
         else:
             open_ports = []
+        
+        #temp
         self.logger.info("Creating report for "+self.name)
         outfile = f"{self.reportdir}/{self.name}.md"
         title= f"PENSEC - {self.name.capitalize()} Report"
@@ -109,4 +111,10 @@ class Nmap(Tool):
             #list with open ports, cpe, etc
         reportfile.create_md_file()
         self.logger.info("Report saved in "+outfile)
+
+        return {
+            "nmap_info": {
+                "open_ports": open_ports
+            }
+        }
         

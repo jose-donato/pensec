@@ -27,8 +27,13 @@ class Tool(object):
         self.target = target
     def set_outdir(self, outdir):
         self.outdir = outdir
+    def set_reportdir(self, reportdir):
+        self.reportdir = reportdir
     def set_assetdir(self, assetdir):
         self.assetdir = assetdir
 
     def run(self):
+        raise NotImplementedError
+
+    def report(self):
         raise NotImplementedError

@@ -38,6 +38,7 @@ class Pipeline(object):
         tool.set_logger(self.logger)
         tool.set_target(self.target)
         tool.set_outdir(f"{self.outdir}/commands")
+        tool.set_reportdir(f"{self.outdir}/reports")
         tool.set_assetdir(self.assetdir)
         self.tools.append(tool)
         if from_config == False:
@@ -74,6 +75,7 @@ class Pipeline(object):
         # verificar que não falta dependência
         # ordenar tools segundo dependências
         # obter output dos runs, passar para REPORTING e TOOLS subsequentes
+        # nmap nse cve scripts is not writing to file
         last_out = None
         last_tool_name = None
         for tool in self.tools:
@@ -81,6 +83,7 @@ class Pipeline(object):
                 out, err = tool.run(last_out)
             else:
                 out, err = tool.run()
+            tool.report()
             last_out = out
             last_tool_name = tool.name
             if err and not tool.IGNORE_STDERR:

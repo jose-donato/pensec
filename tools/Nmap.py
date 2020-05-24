@@ -3,6 +3,7 @@ from utils.Command import execute
 from utils.Files import parsexmlfile
 from pathlib import Path
 import json
+from mdutils.mdutils import MdUtils
 
 
 class Nmap(Tool):
@@ -11,6 +12,7 @@ class Nmap(Tool):
     # ter vários Nmaps cada um executado com opções diferentes
 
     def __init__(self, options):
+        self.files = []
         if not options:
             options = "-sV"
         super().__init__("nmap", options)
@@ -63,6 +65,7 @@ class Nmap(Tool):
                 port_command = f"-p {port}"
                 command = f"nmap --datadir {self.assetdir} {self.options} {port_command} {target} -oX {outfile[1:-1]}"
                 self.logger.info(f"Running Nmap with CVE detection scripts for port {port}: {command}")
+            self.files = []
             return files, ""
         else: 
             outfile = f"'{self.outdir}/{self.name}_{self.options}.xml'"
@@ -70,4 +73,21 @@ class Nmap(Tool):
             self.logger.info(f"Running Nmap: {command}")
             out, err = execute(command)
             file_path = str(Path().absolute())+"/"+outfile[1:-1]
+            self.files = [file_path]
             return [file_path], err
+    
+    def report(self):
+        xml_dict = parsexmlfile(self.files[0])
+        result = json.dumps(xml_dict)
+        nmap_results = json.loads(result)
+        open_ports = nmap_results["nmaprun"]["host"]["ports"]["port"]
+        self.logger.info("Creating report for "+self.name)
+        outfile = f"{self.reportdir}/{self.name}.md"
+        title= f"PENSEC - {self.name.capitalize()} Report"
+        reportfile = MdUtils(file_name=outfile, title=title)
+        reportfile.new_header(level=1, title="Common Statistics")
+        reportfile.new_paragraph(f"{len(open_ports)} open ports\n")
+        reportfile.new_header(level=2, title="Open Ports")
+        #list with open ports, cpe, etc
+        reportfile.create_md_file()
+        

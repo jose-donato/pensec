@@ -8,6 +8,8 @@ class Searchsploit(Tool):
     PROGRAM = "searchsploit"
     OPTIONS_PROMPT = "Options (default: None)\n>> "
     IGNORE_STDERR = True
+    REQUIRES = [Tool.Dependencies.NMAP_SERVICES]
+    PROVIDES = []
 
     def __init__(self, options=""):
         self.files = []

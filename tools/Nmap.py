@@ -1,5 +1,8 @@
 from tools.Tool import Tool
 from utils.Command import execute
+from utils.Files import parsexmlfile
+from pathlib import Path
+import json
 
 class Nmap(Tool):
     OPTIONS_PROMPT = "Options (default: -sV)\n>> "
@@ -25,4 +28,9 @@ class Nmap(Tool):
         outfile = f"'{self.outdir}/{self.name}_{self.options}.xml'"
         command = f"nmap {self.options} {target} -oX {outfile}"
         self.logger.info(f"Running Nmap: {command}")
-        return execute(command)
+        out, err = execute(command)
+        file_path = str(Path().absolute())+"/"+outfile[1:-1]
+        xml_dict = parsexmlfile(file_path)
+        result = json.dumps(xml_dict)
+        return result, err
+        

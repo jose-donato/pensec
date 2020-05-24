@@ -84,18 +84,23 @@ class Pipeline(object):
         # nmap nse cve scripts is not writing to file
         last_out = None
         last_tool_name = None
+        report_obj = None
         for tool in self.tools:
             if last_tool_name == "nmap" and tool.name == "searchsploit":
                 out, err = tool.run(last_out)
             else:
                 out, err = tool.run()
-            tool.report()
+            if report_obj is not None:
+                report_obj = tool.report(report_obj)
+            else:
+                report_obj = tool.report()
             last_out = out
             last_tool_name = tool.name
             if err and not tool.IGNORE_STDERR:
                 self.logger.error(err.decode('ascii'))
             else:
                 self.logger.info("Output saved")
+        print(report_obj)
 
     def check_dependencies(self):
         self.logger.info("Checking dependencies...")

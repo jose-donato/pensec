@@ -23,5 +23,23 @@ def missing_tool_dependencies(tools):
     return missing
 
 def sortby_dependencies(tools):
-    pass
+    tools_with_requirements = list(filter(lambda t: len(t.REQUIRES)!=0, tools))
+    sorted_tools = list(filter(lambda t: len(t.REQUIRES)==0, tools))
+
+    # como tornar um problema P em (quase) NP :')
+    while(len(tools_with_requirements)>0):
+        # percorrer tools por ordenar
+        for i,t in enumerate(tools_with_requirements):
+            fulfilled_requirements = 0
+            for r in t.REQUIRES:
+                if len(get_tools_providing(sorted_tools, r)) > 0:
+                    fulfilled_requirements += 1
+            # se sorted_tools dao todos os requirements
+            if fulfilled_requirements == len(t.REQUIRES):
+                t = tools_with_requirements.pop(i)
+                sorted_tools.append(t)
+    return sorted_tools
+
+
+
 

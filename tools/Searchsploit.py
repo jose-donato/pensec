@@ -10,14 +10,20 @@ class Searchsploit(Tool):
     def __init__(self, options=""):
         super().__init__("searchsploit", options)
 
-    def run(self, xml_file):
-        command = f"searchsploit {self.options} --colour --nmap {xml_file}"
-        self.logger.info(f"Running Searchsploit: {command}")
-        out, err = execute(command)
-        outfile = f"{self.outdir}/{self.name}_{self.options}_fromNmapXml.txt"
-        with open(outfile, "w+") as f:
-            f.write(out.decode("utf-8"))
-        return out, err
+    def run(self, xml_files):
+        print(xml_files)
+        i=0
+        for xml_file in xml_files:
+            command = f"searchsploit {self.options} --colour -v --nmap {xml_file}"
+            self.logger.info(f"Running Searchsploit: {command}")
+            out, err = execute(command)
+            outfile = f"{self.outdir}/{self.name}_{self.options}_fromNmapXml_{i}.txt"
+            i+=1
+            with open(outfile, "a") as f:
+                f.write(out.decode("utf-8"))
+        return outfile, err
+        
+        
 
 
     #temp

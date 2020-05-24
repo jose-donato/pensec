@@ -1,4 +1,8 @@
 # pensec
 
+```
+https://github.com/pypa/pipenv#installation
 pipenv install
-pipenv run python3 test.py
+# Nmap's fingerprinting, etc require root privileges
+pipenv run sudo python3 pentest.py
+```

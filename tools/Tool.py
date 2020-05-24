@@ -6,7 +6,7 @@ class Tool(object):
     IGNORE_STDERR = False
 
     class Dependencies(Enum):
-        NMAP_SERVICES = auto()
+        NMAP_SERVICES = "Nmap Services" # description, to be printed when it's missing
 
     def __init__(self, name, options):
         self.name = name

@@ -3,6 +3,9 @@ from datetime import datetime
 from pensec.Config import Config
 from pensec.Target import Target
 from utils.Logger import Logger
+from utils.Dependencies import check_dependencies
+from utils.Terminal import acknowledge
+from tools.list import TOOLS
 from pathlib import Path
 
 
@@ -14,6 +17,9 @@ class Pipeline(object):
         self.outdir = self.make_outdir()
         self.assetdir =  self.get_assetdir()
         self.logger = Logger(self.config, f"{self.outdir}/logs")   
+
+        self.check_dependencies()
+        self.logger.info(f"Pipeline initialized for target: {hostname}")
 
     def add_tool(self, tool):
         self.logger.info(f"Adding {tool}")
@@ -38,9 +44,9 @@ class Pipeline(object):
                 return -1 # só para sair do menu... (forçar a atualizar)   
         self.logger.info(f"Not found")
         
-    def update_target(self, hostname):
-        self.target.set_target(hostname)
-        #need to update for each tool? maybe refactor?
+    # def update_target(self, hostname):
+        # self.target.set_target(hostname)
+        # need to update for each tool? maybe refactor?
 
 
     def run(self):
@@ -59,6 +65,12 @@ class Pipeline(object):
             else:
                 self.logger.info("Output saved")
 
+    def check_dependencies(self):
+        self.logger.info("Checking dependencies...")
+        dependencies = TOOLS
+        self.available = check_dependencies(dependencies, self.logger)
+        if len(dependencies) != len(self.available):
+            acknowledge()
     
     def make_outdir(self):
         hostname = self.target.hostname

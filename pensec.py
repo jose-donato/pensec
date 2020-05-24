@@ -15,7 +15,7 @@ def addtool_menu():
     def tool_adder(Tool):
         return menu_action(lambda: pipeline.add_tool(Tool(input(Tool.OPTIONS_PROMPT))))
     addtool_entries = Entries(
-        [ Entry(T.__name__, tool_adder(T)) for T in TOOLS ] + \
+        [ Entry(T.__name__, tool_adder(T)) for T in pipeline.available ] + \
         [ Entry("Back", lambda: Menu.EXIT) ]
     )
     return Menu("### ADD TOOL ###", addtool_entries)

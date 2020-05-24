@@ -2,6 +2,7 @@ from tools.Tool import Tool
 from utils.Command import execute
 
 class Nmap(Tool):
+    PROGRAM = "nmap"
     OPTIONS_PROMPT = "Options (default: -sV)\n>> "
     # ter vários Nmaps cada um executado com opções diferentes
     def __init__(self, options):

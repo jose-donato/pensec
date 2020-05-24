@@ -69,7 +69,7 @@ class Nmap(Tool):
                 port_command = f"-p {port}"
                 command = f"nmap --datadir {self.assetdir} {self.options} {port_command} {target} -oX {outfile[1:-1]}"
                 self.logger.info(f"Running Nmap with CVE detection scripts for port {port}: {command}")
-            self.files = []
+            self.files = files 
             return files, ""
         else: 
             outfile = f"'{self.outdir}/{self.name}_{self.options}.xml'"

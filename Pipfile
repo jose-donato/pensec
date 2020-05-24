@@ -8,6 +8,8 @@ verify_ssl = true
 [packages]
 xmltodict = "*"
 simple-term-menu = "*"
+progress = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"

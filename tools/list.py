@@ -6,6 +6,6 @@ from tools.Searchsploit import Searchsploit
 
 TOOLS = [
     Nmap,
+    Searchsploit,
     Metasploit,
-    Searchsploit
 ]

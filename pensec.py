@@ -20,6 +20,13 @@ def addtool_menu():
     )
     return Menu("### ADD TOOL ###", addtool_entries)
 
+def change_hostname():
+    new_hostname = input(f"New hostname (prev. )\n>> ")
+    #better way to update?
+    #pass pipeline with waterfall until here? global var?
+    #pipeline.update_target(new_hostname)
+
+
 def removetool_menu(tool_entries):
     removetool_entries = Entries(
         tool_entries + \
@@ -37,6 +44,7 @@ def configure_menu():
     configure_entries = Entries([
         Entry("Add tool", addtool_menu().run), 
         Entry("Remove tool", run_removetool_menu),
+        #Entry("Change hostname", change_hostname),
         Entry("Back", lambda: Menu.EXIT)
     ])
     return Menu("### CONFIGURE ###", configure_entries)
@@ -52,6 +60,8 @@ def main_menu():
 if __name__ == "__main__":
     os.system("clear")
     target = input("Target (eg. scanme.nmap.org)\n>> ") # localhost
+    if len(target) < 1:
+        target = "scanme.nmap.org"
     pipeline = Pipeline(target)
     main_menu().run()
 

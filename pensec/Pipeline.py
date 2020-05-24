@@ -3,13 +3,16 @@ from datetime import datetime
 from pensec.Config import Config
 from pensec.Target import Target
 from utils.Logger import Logger
+from pathlib import Path
+
 
 class Pipeline(object):
-    def __init__(self, hostname, config=None):
+    def __init__(self, hostname="scanme.nmap.org", config=None):
         self.config = Config.from_file(config) if config else Config()
         self.target = Target(hostname)
         self.tools = []
         self.outdir = self.make_outdir()
+        self.assetdir =  self.get_assetdir()
         self.logger = Logger(self.config, f"{self.outdir}/logs")   
 
     def add_tool(self, tool):
@@ -21,6 +24,7 @@ class Pipeline(object):
         tool.set_logger(self.logger)
         tool.set_target(self.target)
         tool.set_outdir(f"{self.outdir}/commands")
+        tool.set_assetdir(self.assetdir)
         self.tools.append(tool)
         self.logger.info(f"Success")
         return -1 # "só" ficar uniforme com o comportamento do remove_tool
@@ -34,6 +38,9 @@ class Pipeline(object):
                 return -1 # só para sair do menu... (forçar a atualizar)   
         self.logger.info(f"Not found")
         
+    def update_target(self, hostname):
+        self.target.set_target(hostname)
+        #need to update for each tool? maybe refactor?
 
 
     def run(self):
@@ -62,3 +69,7 @@ class Pipeline(object):
         for sd in subdirs:
             os.mkdir(f"{outdir}/{sd}")
         return outdir
+    
+    def get_assetdir(self):
+        path = Path().absolute()
+        return str(path)+"/assets/" 

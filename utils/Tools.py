@@ -1,5 +1,6 @@
 import shlex
 import subprocess
+from progress.bar import Bar
 
 
 #REFACTOR to use Command 
@@ -21,7 +22,7 @@ dependencies = ["nmap", "searchsploit", "msfconsole"]
 def check_dependencies(dependencies):
     bar = Bar('Processing', max=len(dependencies))
     for dependency in dependencies:
-        if not check_program_is_installed(dependency):
+        if not check_if_program_is_installed(dependency):
             #sys.stdout.write('{} is not installed in the system'.format(dependency))
             return False
         bar.next()

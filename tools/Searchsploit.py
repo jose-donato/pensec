@@ -20,6 +20,7 @@ class Searchsploit(Tool):
         return out, err
 
 
+    #temp
     def run_custom(self, result_json):
         ports = json.loads(result_json)["nmaprun"]["host"]["ports"]["port"]
         # ciclo para cada serviço passado pelo nmap

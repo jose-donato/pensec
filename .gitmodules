@@ -1,0 +1,6 @@
+[submodule "assets/vulscan"]
+	path = assets/vulscan
+	url = https://github.com/scipag/vulscan.git
+[submodule "assets/nmap-vulners"]
+	path = assets/nmap-vulners
+	url = https://github.com/vulnersCom/nmap-vulners.git

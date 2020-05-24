@@ -2,6 +2,7 @@ from tools.Tool import Tool
 from utils.Command import execute
 import json
 from mdutils.mdutils import MdUtils
+from pathlib import Path
 
 
 class Searchsploit(Tool):
@@ -17,19 +18,23 @@ class Searchsploit(Tool):
 
     def run(self, xml_files):
         i=0
+        files = []
         for xml_file in xml_files:
             command = f"searchsploit {self.options} --colour -v --nmap {xml_file} --json"
             self.logger.info(f"Running Searchsploit: {command}")
             out, err = execute(command)
             outfile = f"{self.outdir}/{self.name}_{self.options}_fromNmapXml_{i}.txt"
+            files.append(str(Path().absolute())+"/"+outfile])
             i+=1
             with open(outfile, "a") as f:
                 f.write(out.decode("utf-8"))
+        self.files = files 
         return outfile, err
         
         
 
 
+    '''
     #temp
     def run_custom(self, result_json):
         ports = json.loads(result_json)["nmaprun"]["host"]["ports"]["port"]
@@ -48,9 +53,14 @@ class Searchsploit(Tool):
                 self.logger.error("Product not found in service")
         return "", ""
         # return execute(command)
+    '''
 
     def report(self):
         self.logger.info("Creating report for "+self.name)
+        for f in self.files:
+            with open(f, "r") as scanfile:
+                scan = json.loads(scanfile.read())
+                print(scan)
         outfile = f"{self.reportdir}/{self.name}.md"
         title= f"PENSEC - {self.name.capitalize()} Report"
         reportfile = MdUtils(file_name=outfile, title=title)

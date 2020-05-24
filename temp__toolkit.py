@@ -78,6 +78,11 @@ def get_cve_info_id(cve_id):
             return None
     return None
 
+#from utils import Command
+
+#a = Command.execute("nmap --version")
+#print(a.err)
+
 #get_cve_info_id("cve-2010-3333")
 
 #print(search_exploits("linux ssh"))

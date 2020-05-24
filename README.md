@@ -1,8 +1,11 @@
 # pensec
 
+```
+https://github.com/pypa/pipenv#installation
 pipenv install
-pipenv run python3 test.py
-
+# Nmap's fingerprinting, etc require root privileges
+pipenv run sudo python3 pentest.py
+```
 
 
 verify if metasploit, searchsploit, nmap, are installed
@@ -36,3 +39,4 @@ OpenSSH < 7.4 - agent Protocol Arbitrary Library Loading                        
 OpenSSH < 7.7 - User Enumeration (2)                                                                                       | linux/remote/45939.py
 --------------------------------------------------------------------------------------------------------------------------- ---------------------------------
 Shellcodes: No Results
+

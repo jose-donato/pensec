@@ -89,13 +89,13 @@ class Pipeline(object):
                 out, err = tool.run(last_out)
             else:
                 out, err = tool.run()
-            tool.report()
             last_out = out
             last_tool_name = tool.name
             if err and not tool.IGNORE_STDERR:
                 self.logger.error(err.decode('ascii'))
             else:
                 self.logger.info("Output saved")
+            tool.report()
 
     def check_dependencies(self):
         self.logger.info("Checking dependencies...")

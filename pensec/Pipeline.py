@@ -14,6 +14,7 @@ class Pipeline(object):
         self.outdir = self.make_outdir()
         self.assetdir =  self.get_assetdir()
         self.logger = Logger(self.config, f"{self.outdir}/logs")   
+        self.logger.info(f"Pipeline initialized for target: {hostname}")
 
     def add_tool(self, tool):
         self.logger.info(f"Adding {tool}")
@@ -38,9 +39,9 @@ class Pipeline(object):
                 return -1 # só para sair do menu... (forçar a atualizar)   
         self.logger.info(f"Not found")
         
-    def update_target(self, hostname):
-        self.target.set_target(hostname)
-        #need to update for each tool? maybe refactor?
+    # def update_target(self, hostname):
+        # self.target.set_target(hostname)
+        # need to update for each tool? maybe refactor?
 
 
     def run(self):

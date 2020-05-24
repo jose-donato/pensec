@@ -1,7 +1,7 @@
 from pensec.Pipeline import Pipeline
 from tools.list import TOOLS
 from utils.Menu import Entry, Entries, Menu
-import os
+import os, socket
 
 def menu_action(f):
     def acknowledge_result():
@@ -20,13 +20,6 @@ def addtool_menu():
     )
     return Menu("### ADD TOOL ###", addtool_entries)
 
-def change_hostname():
-    new_hostname = input(f"New hostname (prev. )\n>> ")
-    #better way to update?
-    #pass pipeline with waterfall until here? global var?
-    #pipeline.update_target(new_hostname)
-
-
 def removetool_menu(tool_entries):
     removetool_entries = Entries(
         tool_entries + \
@@ -41,6 +34,10 @@ def configure_menu():
             return menu_action(lambda: pipeline.remove_tool(tool))
         tool_entries = [ Entry(str(tool), tool_remover(tool)) for tool in pipeline.tools]
         removetool_menu(tool_entries).run()
+    def change_hostname():
+        #pass pipeline with waterfall until here? global var?
+        #pipeline.update_target(new_hostname)
+        new_hostname = input(f"New hostname (prev. )\n>> ")
     configure_entries = Entries([
         Entry("Add tool", addtool_menu().run), 
         Entry("Remove tool", run_removetool_menu),
@@ -56,12 +53,27 @@ def main_menu():
         Entry("Exit", lambda: Menu.EXIT)
     ])
     return Menu("### PENSEC ###", main_entries)
-    
+
+def get_target():
+    while True:
+        os.system("clear")
+        target = input("Target (eg. scanme.nmap.org)\n>> ") # localhost
+        try:
+            socket.inet_aton(addr)
+            break # is IP address
+        except: pass;
+        try: # try to resolve
+            socket.gethostbyname(target)
+            break # is hostname
+        except: pass;
+        print("Invalid IP/hostname...\nAny key to retry")
+        input()
+    return target
+
+
 if __name__ == "__main__":
-    os.system("clear")
-    target = input("Target (eg. scanme.nmap.org)\n>> ") # localhost
-    if len(target) < 1:
-        target = "scanme.nmap.org"
+    target = get_target()
+            
     pipeline = Pipeline(target)
     main_menu().run()
 

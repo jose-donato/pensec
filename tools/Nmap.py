@@ -8,12 +8,18 @@ from mdutils.mdutils import MdUtils
 
 class Nmap(Tool):
     PROGRAM = "nmap"
-    OPTIONS_PROMPT = "Options (type options):\n1. -sV (default)\n2. -sV --script nmap-vulners,vulscan --script-args vulscandb=scipvuldb.csv\n>> "
+    OPTIONS = Tool.Options([
+        Tool.Option("Detect Versions (default)", "-sV"),
+        Tool.Option("Detect Versions and Vulnerabilities", "-sV --script nmap-vulners,vulscan --script-args vulscandb=scipvuldb.csv"),
+    ])
+    OPTIONS_PROMPT = OPTIONS.prompt()
     REQUIRES = []
     PROVIDES = [Tool.Dependencies.NMAP_SERVICES]
     
     # ter vários Nmaps cada um executado com opções diferentes
     def __init__(self, options):
+        if options.isdigit(): # umas das opcoes built in
+            options = Nmap.OPTIONS.selected(options) or ''
         self.files = []
         if not options:
             options = "-sV"
@@ -63,14 +69,17 @@ class Nmap(Tool):
             ports = self.target.target_ports
             #port = self.target.port  # or common_ports and loop through
             files = []
+            err = b''
             for port in ports:
                 outfile = f"'{self.outdir}/{self.name}_{port}_cve_detection.xml'"
                 files.append(str(Path().absolute())+"/"+outfile[1:-1])
                 port_command = f"-p {port}"
                 command = f"nmap --datadir {self.assetdir} {self.options} {port_command} {target} -oX {outfile[1:-1]}"
                 self.logger.info(f"Running Nmap with CVE detection scripts for port {port}: {command}")
+                stdout, stderr = execute(command)
+                err += stderr
             self.files = files 
-            return files, ""
+            return files, err
         else: 
             outfile = f"'{self.outdir}/{self.name}_{self.options}.xml'"
             command = f"nmap {self.options} {target} -oX {outfile}"

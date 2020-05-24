@@ -5,7 +5,7 @@ from pensec.Target import Target
 from utils.Logger import Logger
 from utils.Dependencies import check_dependencies
 from utils.Terminal import acknowledge
-from tools.list import TOOLS, missing_tool_dependencies
+from tools.list import TOOLS, missing_tool_dependencies, sortby_dependencies
 from pathlib import Path
 
 
@@ -76,16 +76,12 @@ class Pipeline(object):
             self.logger.error(missing)
             self.logger.error("Did not execute. Please fullfil requirements...")
             return
-
-        # TODO:
-        # verificar que não falta dependência
-        # ordenar tools segundo dependências
-        # obter output dos runs, passar para REPORTING e TOOLS subsequentes
-        # nmap nse cve scripts is not writing to file
+        sorted_tools = sortby_dependencies(self.tools)
+        self.logger.debug(f"Tool order: {','.join([t.__class__.__name__ for t in sorted_tools])}")
         last_out = None
         last_tool_name = None
         report_obj = None
-        for tool in self.tools:
+        for tool in sorted_tools:
             if last_tool_name == "nmap" and tool.name == "searchsploit":
                 out, err = tool.run(last_out)
             else:
@@ -100,7 +96,7 @@ class Pipeline(object):
                 self.logger.error(err.decode('ascii'))
             else:
                 self.logger.info("Output saved")
-        print(report_obj)
+                tool.report()
 
     def check_dependencies(self):
         self.logger.info("Checking dependencies...")

@@ -7,6 +7,22 @@ class Tool(object):
 
     class Dependencies(Enum):
         NMAP_SERVICES = "Nmap Services" # description, to be printed when it's missing
+    
+    class Option(object):
+        def __init__(self, title, options):
+            self.title = title
+            self.tool_options = options
+    class Options(object):
+        def __init__(self, options):
+            self.options = options
+        def prompt(self):
+            return "Options:\n{}\n>> ".format('\n'.join([f"{i}. {o.title}" for i,o in enumerate(self.options,1)]))
+        def selected(self, option):
+            try:
+                index = int(option)
+                return self.options[index-1].tool_options
+            except:
+                return None
 
     def __init__(self, name, options):
         self.name = name

@@ -8,7 +8,7 @@ cfg = Config(OPTION=<something>)
 cfg = Config.from_file('config/stealthy.txt')
 """
 class Config(object):
-    DEFAULTS_FILENAME = "config/defaults.txt"
+    DEFAULTS_FILENAME = "defaults.txt"
     defaults = {}
 
     def __init__(self, **kwargs):
@@ -29,7 +29,7 @@ class Config(object):
     @classmethod
     def params_from_file(cls, filename):
         params = copy.deepcopy(cls.defaults)
-        with open(filename, "r") as fp:
+        with open(f"config/{filename}", "r") as fp:
             for line in fp:
                 if len(line.strip()) == 0 or line.strip()[0] == '#':
                     continue
@@ -37,8 +37,8 @@ class Config(object):
                 params[k] = eval(v)
         return params
 
-    def gettools(self):
-        return ((k, getattr(self, k)) for k in self.__dict__ if k.startswith("TOOL"))
+    def tools(self):
+        return [(k, getattr(self, k)) for k in self.__dict__ if k.startswith("TOOL")]
 
     def items(self):
         return ((k, getattr(self, k)) for k in self.__dict__ if not k.startswith("_"))

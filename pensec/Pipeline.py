@@ -19,9 +19,17 @@ class Pipeline(object):
         self.logger = Logger(self.config, f"{self.outdir}/logs")   
 
         self.available = self.check_dependencies()
+        self.load_tools()
         self.logger.info(f"Pipeline initialized for target: {hostname}")
 
-    def add_tool(self, tool):
+    # load from config
+    def load_tools(self):
+        for k,v in self.config.tools():
+            tool, options = v.split(";")
+            Tool = list((T for T in TOOLS if T.__name__==tool and T in self.available))[0]
+            self.add_tool(Tool(options), from_config=True)
+
+    def add_tool(self, tool, from_config=False):
         self.logger.info(f"Adding {tool}")
         for t in self.tools:
             if tool == t: # same tool with same options...
@@ -32,6 +40,12 @@ class Pipeline(object):
         tool.set_outdir(f"{self.outdir}/commands")
         tool.set_assetdir(self.assetdir)
         self.tools.append(tool)
+        if from_config == False:
+            if not hasattr(self, "tool_iota"):
+                # self.tool_iota = len(self.config.tools())
+                self.tool_iota = max( [int(k.split("_")[-1]) for k,v in self.config.tools()] )
+            self.tool_iota += 1
+            setattr(self.config, f"TOOL_{self.tool_iota}", f"{repr(tool)}")
         self.logger.info(f"Success")
         return -1 # "só" ficar uniforme com o comportamento do remove_tool
 
@@ -40,6 +54,8 @@ class Pipeline(object):
         for t in self.tools:
             if tool == t: # same tool with same options...
                 self.tools.remove(t)
+                configentry = [v for k,v in self.config.tools()].index(repr(tool))
+                delattr(self.config, f"{self.config.tools()[configentry][0]}")
                 self.logger.info(f"Success")
                 return -1 # só para sair do menu... (forçar a atualizar)   
         self.logger.info(f"Not found")

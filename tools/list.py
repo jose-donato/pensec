@@ -18,5 +18,6 @@ def missing_tool_dependencies(tools):
     for t in tools:
         for r in t.REQUIRES:
             if len(get_tools_providing(tools, r)) == 0:
-                missing += f"Tool {t.__class__.__name__} requires {r.value}"
+                tools_providing = list(map(lambda T: T.__name__, get_tools_providing(TOOLS, r)))
+                missing += f"Tool {t.__class__.__name__} requires {r.value} (provided by: {', '.join(tools_providing)})"
     return missing

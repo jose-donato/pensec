@@ -96,7 +96,7 @@ class Nmap(Tool):
         result = json.dumps(xml_dict)
         nmap_results = json.loads(result)
         ports = nmap_results["nmaprun"]["host"]["ports"]
-        print(nmap_results)
+        #cpe, portid, product, name, version, hosts/up
         if 'port' in ports:
             open_ports = ports["port"]
         else:

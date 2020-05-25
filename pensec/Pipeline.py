@@ -104,6 +104,7 @@ class Pipeline(object):
         reportfile = MdUtils(file_name=outfile, title=title)
         reportfile.new_header(level=3, title="Common Statistics")
         open_ports = reports[Tool.Dependencies.NMAP_SERVICES]["open_ports"]
+        print(open_ports)
         exploits = list(reports[Tool.Dependencies.EXPLOITS].values())[0]["exploits"]
         #title, path, type, platform
         n_open_ports = len(open_ports)

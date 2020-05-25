@@ -150,6 +150,19 @@ class Pipeline(object):
             columns=5, rows=int(len(open_ports_table)/5), text=open_ports_table, text_align='center')
 
         # wiorhuweuirweuirhwie
+        reportfile.new_header(level=3, title="Exploits")
+        for k,v in searches:
+            reportfile.new_header(level=5, title=k)
+            types = {}
+            for e in v["exploits"]:
+                if e["Type"] in types:
+                    types[e["Type"]].append(e)
+                else:
+                    types[e["Type"]] = [e]
+            for t,exploits in types.items():
+                reportfile.new_paragraph(t)
+                n_items = [f"{e['Title']} ({e['Path']})"  for e in exploits]
+                reportfile.new_list(items=n_items)
 
         reportfile.create_md_file()
         self.logger.info("Report saved in "+outfile)

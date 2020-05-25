@@ -149,7 +149,6 @@ class Pipeline(object):
         reportfile.new_table(
             columns=5, rows=int(len(open_ports_table)/5), text=open_ports_table, text_align='center')
 
-        # wiorhuweuirweuirhwie
         reportfile.new_header(level=3, title="Exploits")
         for k,v in searches:
             reportfile.new_header(level=5, title=k)

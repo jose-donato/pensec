@@ -33,7 +33,8 @@ class Config(object):
             for line in fp:
                 if len(line.strip()) == 0 or line.strip()[0] == '#':
                     continue
-                k, v = map(lambda s: s.strip(), line.split("="))
+                k, *v = map(lambda s: s.strip(), line.split("="))
+                v = '='.join(v)
                 params[k] = eval(v)
         return params
 

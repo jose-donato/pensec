@@ -27,11 +27,19 @@ class Pipeline(object):
 
     # load from config
     def load_tools(self):
+        missing = []
         for k, v in self.config.tools():
-            tool, options = v.split(";")
-            Tool = list((T for T in TOOLS if T.__name__ ==
-                         tool and T in self.available))[0]
-            self.add_tool(Tool(options), from_config=True)
+            tool, *options = v.split(";")
+            options = ";".join(options)
+            Tool = [T for T in TOOLS if T.__name__ == tool and T in self.available]
+            if len(Tool) == 0:
+                missing.append(tool)
+            else:
+                self.add_tool(Tool.pop()(options), from_config=True)
+        if len(missing)>0:
+            os.system("clear")
+            [self.logger.error(f"Skipping tool {tool} in configuration (Missing)") for tool in missing]
+            acknowledge()
 
     def add_tool(self, tool, from_config=False):
         self.logger.info(f"Adding {tool}")

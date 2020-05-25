@@ -7,6 +7,7 @@ class Tool(object):
 
     class Dependencies(Enum):
         NMAP_SERVICES = "Nmap Services" # description, to be printed when it's missing
+        EXPLOITS = "Searchsploit exploits"
     
     class Option(object):
         def __init__(self, title, options):

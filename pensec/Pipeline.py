@@ -7,7 +7,8 @@ from utils.Dependencies import check_dependencies
 from utils.Terminal import acknowledge
 from tools.list import TOOLS, missing_tool_dependencies, sortby_dependencies
 from pathlib import Path
-
+from mdutils.mdutils import MdUtils
+from tools.Tool import Tool
 
 class Pipeline(object):
     def __init__(self, hostname="scanme.nmap.org", config=None):
@@ -95,6 +96,23 @@ class Pipeline(object):
                 report_obj = tool.report(reports)
                 for p in tool.PROVIDES:
                     reports[p] = report_obj
+        self.create_report(reports)
+
+    def create_report(self, reports):
+        outfile = f"{self.outdir}/reports/Report.md"
+        title= f"PENSEC - Report of {self.target.hostname}"
+        reportfile = MdUtils(file_name=outfile, title=title)
+        reportfile.new_header(level=3, title="Common Statistics")
+        open_ports = reports[Tool.Dependencies.NMAP_SERVICES]["open_ports"]
+        exploits = list(reports[Tool.Dependencies.EXPLOITS].values())[0]["exploits"]
+        #title, path, type, platform
+        n_open_ports = len(open_ports)
+        n_exploits = len(exploits) 
+        n_items = [f"{n_open_ports} open ports found", f"{n_exploits} exploits found"]
+        reportfile.new_list(items=n_items)
+        reportfile.new_header(level=3, title="")
+        reportfile.create_md_file()
+        self.logger.info("Report saved in "+outfile)
 
     def check_dependencies(self):
         self.logger.info("Checking dependencies...")

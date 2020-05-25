@@ -10,15 +10,16 @@ class Nmap(Tool):
     PROGRAM = "nmap"
     OPTIONS = Tool.Options([
         Tool.Option("Detect Versions (default)", "-sV"),
-        Tool.Option("Detect Versions and Vulnerabilities", "-sV --script nmap-vulners,vulscan --script-args vulscandb=scipvuldb.csv"),
+        Tool.Option("Detect Versions and Vulnerabilities",
+                    "-sV --script nmap-vulners,vulscan --script-args vulscandb=scipvuldb.csv"),
     ])
     OPTIONS_PROMPT = OPTIONS.prompt()
     REQUIRES = []
     PROVIDES = [Tool.Dependencies.NMAP_SERVICES]
-    
+
     # ter vários Nmaps cada um executado com opções diferentes
     def __init__(self, options):
-        if options.isdigit(): # umas das opcoes built in
+        if options.isdigit():  # umas das opcoes built in
             options = Nmap.OPTIONS.selected(options) or ''
         self.files = []
         if not options:
@@ -62,12 +63,12 @@ class Nmap(Tool):
         file_path = str(Path().absolute())+"/"+outfile[1:-1]
         return file_path, err
         '''
-        
+
     def run(self, dependencies):
         target = self.target.hostname
         if "--script nmap-vulners,vulscan --script-args vulscandb=scipvuldb.csv" in self.options:
             ports = self.target.target_ports
-            #port = self.target.port  # or common_ports and loop through
+            # port = self.target.port  # or common_ports and loop through
             files = []
             err = b''
             for port in ports:
@@ -75,12 +76,13 @@ class Nmap(Tool):
                 files.append(str(Path().absolute())+"/"+outfile[1:-1])
                 port_command = f"-p {port}"
                 command = f"nmap --datadir {self.assetdir} {self.options} {port_command} {target} -oX {outfile[1:-1]}"
-                self.logger.info(f"Running Nmap with CVE detection scripts for port {port}: {command}")
+                self.logger.info(
+                    f"Running Nmap with CVE detection scripts for port {port}: {command}")
                 stdout, stderr = execute(command)
                 err += stderr
-            self.files = files 
+            self.files = files
             return files, err
-        else: 
+        else:
             outfile = f"'{self.outdir}/{self.name}_{self.options}.xml'"
             command = f"nmap {self.options} {target} -oX {outfile}"
             self.logger.info(f"Running Nmap: {command}")
@@ -88,33 +90,32 @@ class Nmap(Tool):
             file_path = str(Path().absolute())+"/"+outfile[1:-1]
             self.files = [file_path]
             return [file_path], err
-    
+
     def report(self, reports):
         xml_dict = parsexmlfile(self.files[0])
         result = json.dumps(xml_dict)
         nmap_results = json.loads(result)
         ports = nmap_results["nmaprun"]["host"]["ports"]
+        print(nmap_results)
+        #cpe, portid, product, name, version, hosts/up
         if 'port' in ports:
             open_ports = ports["port"]
         else:
             open_ports = []
-        
-        #temp
+
+        # temp
         self.logger.info("Creating report for "+self.name)
         outfile = f"{self.reportdir}/{self.name}.md"
-        title= f"PENSEC - {self.name.capitalize()} Report"
+        title = f"PENSEC - {self.name.capitalize()} Report"
         reportfile = MdUtils(file_name=outfile, title=title)
         reportfile.new_header(level=1, title="Common Statistics")
         reportfile.new_paragraph(f"{len(open_ports)} open ports\n")
         if len(open_ports) > 0:
             reportfile.new_header(level=2, title="Open Ports")
-            #list with open ports, cpe, etc
+            # list with open ports, cpe, etc
         reportfile.create_md_file()
         self.logger.info("Report saved in "+outfile)
 
         return {
-            "nmap_info": {
-                "open_ports": open_ports
-            }
+            "open_ports": open_ports
         }
-        

@@ -10,7 +10,7 @@ class Searchsploit(Tool):
     OPTIONS_PROMPT = "Options (default: None)\n>> "
     IGNORE_STDERR = True
     REQUIRES = [Tool.Dependencies.NMAP_SERVICES]
-    PROVIDES = []
+    PROVIDES = [Tool.Dependencies.EXPLOITS]
 
     def __init__(self, options=""):
         self.files = []
@@ -58,7 +58,10 @@ class Searchsploit(Tool):
         obj = {}
         for f in self.files:
             with open(f, "r") as scanfile:
-                scan = json.loads(scanfile.read().split("\n\n")[0])
+                readfile = scanfile.read()
+                if not readfile:
+                    return {} 
+                scan = json.loads(readfile.split("\n\n")[0])
                 if 'RESULTS_EXPLOIT' in scan and 'SEARCH' in scan:
                     obj[scan["SEARCH"]] = {
                         "exploits": scan["RESULTS_EXPLOIT"]
@@ -71,5 +74,5 @@ class Searchsploit(Tool):
         reportfile.new_paragraph(f"X exploits found\n")
         reportfile.create_md_file()
         self.logger.info("Report saved in "+outfile)
-        report_dict["searchsploit_info"] = obj
-        return report_dict 
+        #report_dict["searchsploit_info"] = obj
+        return obj

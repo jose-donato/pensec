@@ -104,13 +104,20 @@ class Pipeline(object):
         reportfile = MdUtils(file_name=outfile, title=title)
         reportfile.new_header(level=3, title="Common Statistics")
         open_ports = reports[Tool.Dependencies.NMAP_SERVICES]["open_ports"]
-        exploits = list(reports[Tool.Dependencies.EXPLOITS].values())[0]["exploits"]
+        searches = reports[Tool.Dependencies.EXPLOITS].items()
+        
         #title, path, type, platform
         n_open_ports = len(open_ports)
-        n_exploits = len(exploits) 
+        n_exploits = 0
+        for k,v in searches:
+            n_exploits += len(v["exploits"])
         n_items = [f"{n_open_ports} open ports found", f"{n_exploits} exploits found"]
         reportfile.new_list(items=n_items)
         reportfile.new_header(level=3, title="")
+
+
+        # wiorhuweuirweuirhwie
+
         reportfile.create_md_file()
         self.logger.info("Report saved in "+outfile)
 

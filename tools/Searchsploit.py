@@ -58,14 +58,12 @@ class Searchsploit(Tool):
         obj = {}
         for f in self.files:
             with open(f, "r") as scanfile:
-                readfile = scanfile.read()
-                if not readfile:
-                    return {} 
-                scan = json.loads(readfile.split("\n\n")[0])
-                if 'RESULTS_EXPLOIT' in scan and 'SEARCH' in scan:
-                    obj[scan["SEARCH"]] = {
-                        "exploits": scan["RESULTS_EXPLOIT"]
-                    }
+                for s in scanfile.read().split("\n\n")[:-1]:
+                    scan = json.loads(s)
+                    if 'RESULTS_EXPLOIT' in scan and 'SEARCH' in scan:
+                        obj[scan["SEARCH"]] = {
+                            "exploits": scan["RESULTS_EXPLOIT"]
+                        }
         #temp
         outfile = f"{self.reportdir}/{self.name}.md"
         title= f"PENSEC - {self.name.capitalize()} Report"

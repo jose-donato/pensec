@@ -1,4 +1,5 @@
-import os,re
+import os
+import re
 from datetime import datetime
 from pensec.Config import Config
 from pensec.Target import Target
@@ -10,14 +11,15 @@ from pathlib import Path
 from mdutils.mdutils import MdUtils
 from tools.Tool import Tool
 
+
 class Pipeline(object):
     def __init__(self, hostname="scanme.nmap.org", config=None):
         self.config = Config.from_file(config) if config else Config()
         self.target = Target(hostname)
         self.tools = []
         self.outdir = self.make_outdir()
-        self.assetdir =  self.get_assetdir()
-        self.logger = Logger(self.config, f"{self.outdir}/logs")   
+        self.assetdir = self.get_assetdir()
+        self.logger = Logger(self.config, f"{self.outdir}/logs")
 
         self.available = self.check_dependencies()
         self.load_tools()
@@ -25,15 +27,16 @@ class Pipeline(object):
 
     # load from config
     def load_tools(self):
-        for k,v in self.config.tools():
+        for k, v in self.config.tools():
             tool, options = v.split(";")
-            Tool = list((T for T in TOOLS if T.__name__==tool and T in self.available))[0]
+            Tool = list((T for T in TOOLS if T.__name__ ==
+                         tool and T in self.available))[0]
             self.add_tool(Tool(options), from_config=True)
 
     def add_tool(self, tool, from_config=False):
         self.logger.info(f"Adding {tool}")
         for t in self.tools:
-            if tool == t: # same tool with same options...
+            if tool == t:  # same tool with same options...
                 self.logger.info(f"Duplicate")
                 return
         tool.set_logger(self.logger)
@@ -45,28 +48,29 @@ class Pipeline(object):
         if from_config == False:
             if not hasattr(self, "tool_iota"):
                 # self.tool_iota = len(self.config.tools())
-                tool_indexes = [int(k.split("_")[-1]) for k,v in self.config.tools()]
+                tool_indexes = [int(k.split("_")[-1])
+                                for k, v in self.config.tools()]
                 self.tool_iota = len(tool_indexes) and max(tool_indexes)
             self.tool_iota += 1
             setattr(self.config, f"TOOL_{self.tool_iota}", f"{repr(tool)}")
         self.logger.info(f"Success")
-        return -1 # "só" ficar uniforme com o comportamento do remove_tool
+        return -1  # "só" ficar uniforme com o comportamento do remove_tool
 
     def remove_tool(self, tool):
         self.logger.info(f"Removing {tool}")
         for t in self.tools:
-            if tool == t: # same tool with same options...
+            if tool == t:  # same tool with same options...
                 self.tools.remove(t)
-                configentry = [v for k,v in self.config.tools()].index(repr(tool))
+                configentry = [v for k, v in self.config.tools()
+                               ].index(repr(tool))
                 delattr(self.config, f"{self.config.tools()[configentry][0]}")
                 self.logger.info(f"Success")
-                return -1 # só para sair do menu... (forçar a atualizar)   
+                return -1  # só para sair do menu... (forçar a atualizar)
         self.logger.info(f"Not found")
-        
+
     # def update_target(self, hostname):
         # self.target.set_target(hostname)
         # need to update for each tool? maybe refactor?
-
 
     def run(self):
         if len(self.tools) == 0:
@@ -75,11 +79,13 @@ class Pipeline(object):
         missing = missing_tool_dependencies(self.tools)
         if missing:
             self.logger.error(missing)
-            self.logger.error("Did not execute. Please fullfil requirements...")
+            self.logger.error(
+                "Did not execute. Please fullfil requirements...")
             return
         sorted_tools = sortby_dependencies(self.tools)
-        self.logger.debug(f"Tool order: {','.join([t.__class__.__name__ for t in sorted_tools])}")
-        
+        self.logger.debug(
+            f"Tool order: {','.join([t.__class__.__name__ for t in sorted_tools])}")
+
         outputs = {}
         reports = {}
         report_obj = None
@@ -87,8 +93,7 @@ class Pipeline(object):
             out, err = tool.run(outputs)
             for p in tool.PROVIDES:
                 outputs[p] = out
-            
-            
+
             if err and not tool.IGNORE_STDERR:
                 self.logger.error(err.decode('ascii'))
             else:
@@ -100,21 +105,49 @@ class Pipeline(object):
 
     def create_report(self, reports):
         outfile = f"{self.outdir}/reports/Report.md"
-        title= f"PENSEC - Report of {self.target.hostname}"
+        title = f"PENSEC - Report of {self.target.hostname}"
         reportfile = MdUtils(file_name=outfile, title=title)
         reportfile.new_header(level=3, title="Common Statistics")
         open_ports = reports[Tool.Dependencies.NMAP_SERVICES]["open_ports"]
         searches = reports[Tool.Dependencies.EXPLOITS].items()
-        
+
         #title, path, type, platform
         n_open_ports = len(open_ports)
         n_exploits = 0
-        for k,v in searches:
+        for k, v in searches:
             n_exploits += len(v["exploits"])
-        n_items = [f"{n_open_ports} open ports found", f"{n_exploits} exploits found"]
+        n_items = [f"{n_open_ports} open ports found",
+                   f"{n_exploits} exploits found"]
         reportfile.new_list(items=n_items)
         reportfile.new_header(level=3, title="")
 
+        #cpe, portid, product, name, version, hosts/up
+
+        open_ports_table = ["name", "product", "version", "cpe", "portid"]
+
+        fields = ["@name", "@product", "@version", "cpe"]
+        if not isinstance(open_ports, list):
+            open_ports = [open_ports]
+        for port in open_ports:
+            l = []
+            if "service" in port:
+                for field in fields:
+                    if field in port["service"]:
+                        if isinstance(port["service"][field], str):
+                            l.append(port["service"][field])
+                        else:
+                            l.append(",".join(port["service"][field]))
+                    else:
+                        l.append("")
+            else:
+                l.extend(["", "", "", ""])
+            if "@portid" in port:
+                l.append(port["@portid"])
+            else:
+                l.append("")
+            open_ports_table.extend(l)
+        reportfile.new_table(
+            columns=5, rows=int(len(open_ports_table)/5), text=open_ports_table, text_align='center')
 
         # wiorhuweuirweuirhwie
 
@@ -128,7 +161,7 @@ class Pipeline(object):
         if len(dependencies) != len(available):
             acknowledge()
         return available
-    
+
     def make_outdir(self):
         hostname = self.target.hostname
         timestamp = re.sub(r'[/:]', '-', datetime.now().strftime('%x_%X'))
@@ -138,10 +171,10 @@ class Pipeline(object):
         for sd in subdirs:
             os.mkdir(f"{outdir}/{sd}")
         return outdir
-    
+
     def get_assetdir(self):
         path = Path().absolute()
-        return str(path)+"/assets/" 
+        return str(path)+"/assets/"
 
     def viewconfig(self):
         self.logger.info(f"Showing current config:")
@@ -154,7 +187,7 @@ class Pipeline(object):
         with open(f"config/{outfile}", "w+") as f:
             f.write(str(self.config))
         self.logger.info(f"Config saved to {outfile}")
-    
+
     # called on exit from main menu
     def cleanup(self):
         self.logger.end()

@@ -101,68 +101,21 @@ class Pipeline(object):
                 report_obj = tool.report(reports)
                 for p in tool.PROVIDES:
                     reports[p] = report_obj
-        self.create_report(reports)
+        self.create_report(reports, sorted_tools)
 
-    def create_report(self, reports):
+    def create_report(self, reports, sorted_tools):
         outfile = f"{self.outdir}/reports/Report.md"
         title = f"PENSEC - Report of {self.target.hostname}"
         reportfile = MdUtils(file_name=outfile, title=title)
+
+        # "Execute Summary"
         reportfile.new_header(level=3, title="Common Statistics")
-        open_ports = reports[Tool.Dependencies.NMAP_SERVICES]["open_ports"]
-        searches = reports[Tool.Dependencies.EXPLOITS].items()
-
-        #title, path, type, platform
-        n_open_ports = len(open_ports)
-        n_exploits = 0
-        for k, v in searches:
-            n_exploits += len(v["exploits"])
-        n_items = [f"{n_open_ports} open ports found",
-                   f"{n_exploits} exploits found"]
-        reportfile.new_list(items=n_items)
-        reportfile.new_header(level=3, title="")
-
-        #cpe, portid, product, name, version, hosts/up
-
-        open_ports_table = ["name", "product", "version", "cpe", "portid"]
-
-        fields = ["@name", "@product", "@version", "cpe"]
-        if not isinstance(open_ports, list):
-            open_ports = [open_ports]
-        for port in open_ports:
-            l = []
-            if "service" in port:
-                for field in fields:
-                    if field in port["service"]:
-                        if isinstance(port["service"][field], str):
-                            l.append(port["service"][field])
-                        else:
-                            l.append(",".join(port["service"][field]))
-                    else:
-                        l.append("")
-            else:
-                l.extend(["", "", "", ""])
-            if "@portid" in port:
-                l.append(port["@portid"])
-            else:
-                l.append("")
-            open_ports_table.extend(l)
-        reportfile.new_table(
-            columns=5, rows=int(len(open_ports_table)/5), text=open_ports_table, text_align='center')
-
-        reportfile.new_header(level=3, title="Exploits")
-        for k,v in searches:
-            reportfile.new_header(level=5, title=k)
-            types = {}
-            for e in v["exploits"]:
-                if e["Type"] in types:
-                    types[e["Type"]].append(e)
-                else:
-                    types[e["Type"]] = [e]
-            for t,exploits in types.items():
-                reportfile.new_paragraph(t)
-                n_items = [f"{e['Title']} ({e['Path']})"  for e in exploits]
-                reportfile.new_list(items=n_items)
-
+        for tool in sorted_tools:
+            tool.write_report_summary(reportfile, reports)
+        # "Technical Details"
+        for tool in sorted_tools:
+            tool.write_report(reportfile, reports)
+            
         reportfile.create_md_file()
         self.logger.info("Report saved in "+outfile)
 

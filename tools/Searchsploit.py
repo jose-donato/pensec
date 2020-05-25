@@ -74,3 +74,28 @@ class Searchsploit(Tool):
         self.logger.info("Report saved in "+outfile)
         #report_dict["searchsploit_info"] = obj
         return obj
+
+    def write_report_summary(self, reportfile, reports):
+        searches = reports[Tool.Dependencies.EXPLOITS].items()
+        n_exploits = 0
+        for k, v in searches:
+            n_exploits += len(v["exploits"])
+        n_items = [f"{n_exploits} exploits found"]
+        reportfile.new_list(items=n_items)
+
+
+    def write_report(self, reportfile, reports):
+        searches = reports[Tool.Dependencies.EXPLOITS].items()
+        reportfile.new_header(level=3, title="Exploits")
+        for k,v in searches:
+            reportfile.new_header(level=5, title=k)
+            types = {}
+            for e in v["exploits"]:
+                if e["Type"] in types:
+                    types[e["Type"]].append(e)
+                else:
+                    types[e["Type"]] = [e]
+            for t,exploits in types.items():
+                reportfile.new_paragraph(t)
+                n_items = [f"{e['Title']} ({e['Path']})"  for e in exploits]
+                reportfile.new_list(items=n_items)

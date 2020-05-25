@@ -95,7 +95,8 @@ class Pipeline(object):
                 outputs[p] = out
 
             if err and not tool.IGNORE_STDERR:
-                self.logger.error(err.decode('ascii'))
+                self.logger.error(f"{err.decode('ascii')}\nExiting...")
+                return
             else:
                 self.logger.info("Output saved")
                 report_obj = tool.report(reports)

@@ -118,3 +118,40 @@ class Nmap(Tool):
         return {
             "open_ports": open_ports
         }
+
+    def write_report_summary(self, reportfile, reports):
+        open_ports = reports[Tool.Dependencies.NMAP_SERVICES]["open_ports"]
+        n_open_ports = len(open_ports)
+        
+        n_items = [f"{n_open_ports} open ports found"]
+        reportfile.new_list(items=n_items)
+
+    def write_report(self, reportfile, reports):
+        open_ports = reports[Tool.Dependencies.NMAP_SERVICES]["open_ports"]
+        reportfile.new_header(level=3, title="Services")
+
+        #cpe, portid, product, name, version, hosts/up
+        open_ports_table = ["name", "product", "version", "cpe", "portid"]
+        fields = ["@name", "@product", "@version", "cpe"]
+        if not isinstance(open_ports, list):
+            open_ports = [open_ports]
+        for port in open_ports:
+            l = []
+            if "service" in port:
+                for field in fields:
+                    if field in port["service"]:
+                        if isinstance(port["service"][field], str):
+                            l.append(port["service"][field])
+                        else:
+                            l.append(",".join(port["service"][field]))
+                    else:
+                        l.append("")
+            else:
+                l.extend(["", "", "", ""])
+            if "@portid" in port:
+                l.append(port["@portid"])
+            else:
+                l.append("")
+            open_ports_table.extend(l)
+        reportfile.new_table(
+            columns=5, rows=int(len(open_ports_table)/5), text=open_ports_table, text_align='center')

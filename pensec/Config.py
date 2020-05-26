@@ -15,7 +15,9 @@ class Config(object):
         if not Config.defaults:
             Config.defaults = Config.params_from_file(Config.DEFAULTS_FILENAME)
         for k, v in Config.defaults.items():
-            setattr(self, k, v)
+            # so adicionar tools default se nao estamos a carregar outro ficheiro (ie. temos kwargs)
+            if not kwargs or not k.startswith("TOOL_"):
+                setattr(self, k, v)
 
         for k, v in kwargs.items():
             setattr(self, k, v)

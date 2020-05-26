@@ -29,6 +29,7 @@ def sortby_dependencies(tools):
     # como tornar um problema P em (quase) NP :')
     while(len(tools_with_requirements)>0):
         # percorrer tools por ordenar
+        removed = 0
         for i,t in enumerate(tools_with_requirements):
             fulfilled_requirements = 0
             for r in t.REQUIRES:
@@ -38,6 +39,10 @@ def sortby_dependencies(tools):
             if fulfilled_requirements == len(t.REQUIRES):
                 t = tools_with_requirements.pop(i)
                 sorted_tools.append(t)
+                removed += 1
+        if not removed:
+            self.logger.error(f"Circular dependencies ({', '.join(tools_with_requirements)})")
+            return []
     return sorted_tools
 
 

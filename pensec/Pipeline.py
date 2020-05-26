@@ -91,6 +91,7 @@ class Pipeline(object):
                 "Did not execute. Please fullfil requirements...")
             return
         sorted_tools = sortby_dependencies(self.tools)
+        if not sorted_tools: return
         self.logger.debug(
             f"Tool order: {','.join([t.__class__.__name__ for t in sorted_tools])}")
 
